@@ -718,3 +718,4 @@ let x;
 
 暂时不想写了，开个坑
 [JS执行上下文的两个阶段做了些啥？](https://blog.csdn.net/qq449245884/article/details/106913188)
+[深入浅出JavaScript运行机制](https://juejin.cn/post/6844903714818359310)
