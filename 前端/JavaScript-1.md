@@ -6,7 +6,27 @@
     - [==的运算细节](#的运算细节)
     - [转数字](#转数字)
     - [转Boolean](#转boolean)
+    - [判断js数据类型的四种方法](#判断js数据类型的四种方法)
+        - [typeof](#typeof)
+        - [instanceof](#instanceof)
+        - [constructor方法](#constructor方法)
+        - [toString()方法：对于非object对象，需要使用call/apply方法来调用:Object.prototype.toString.call(1)//[object Number]](#tostring方法对于非object对象需要使用callapply方法来调用objectprototypetostringcall1object-number)
+    - [判断null和undefined](#判断null和undefined)
+        - [undefined](#undefined)
+            - [定义/意义](#定义意义)
+            - [判断-两种方法](#判断-两种方法)
+            - [void 0](#void-0)
+            - [全局属性window.undefined](#全局属性windowundefined)
+        - [undefined==null//true](#undefinednulltrue)
+        - [null](#null)
+            - [定义](#定义)
+            - [判断-2种方法](#判断-2种方法)
+            - [typeof null](#typeof-null)
+            - [null的使用/意义](#null的使用意义)
+                - [对于定义的变量，如果是打算让它成为一个保存对象的变量，但还没有保存，但可以先给它初始化为null。](#对于定义的变量如果是打算让它成为一个保存对象的变量但还没有保存但可以先给它初始化为null)
+                - [对于使用完成的变量，可以通过为它赋null值来释放它的引用。（感觉很有用）--->什么是循环引用](#对于使用完成的变量可以通过为它赋null值来释放它的引用感觉很有用---什么是循环引用)
 - [变量类型](#变量类型)
+    - [[你真的掌握变量和类型了吗](https://juejin.cn/post/6844903854882947080)](#你真的掌握变量和类型了吗httpsjuejincnpost6844903854882947080)
     - [原始类型与引用类型](#原始类型与引用类型)
         - [再谈堆栈](#再谈堆栈)
         - [对变量的复制](#对变量的复制)
@@ -48,7 +68,7 @@
             - [隐式全局变量不会被提升](#隐式全局变量不会被提升)
             - [var a=b=1;var a=b,b=1;](#var-ab1var-abb1)
             - [经典for循环](#经典for循环)
-    - [typeof](#typeof)
+    - [typeof](#typeof-1)
 - [js执行阶段开了什么（未完待续）](#js执行阶段开了什么未完待续)
 
 <!-- /TOC -->
@@ -187,11 +207,80 @@ erflow上的解释](https://stackoverflow.com/questions/27632391/why-null-false-
 
 只有`+0,-0,null,undefined,'',NaN`为false，其余都为true。
 
+## 判断js数据类型的四种方法
+
+[判断JS数据类型的四种方法](https://www.cnblogs.com/onepixel/p/5126046.html)
+
+### typeof
+### instanceof
+### constructor方法
+### toString()方法：对于非object对象，需要使用call/apply方法来调用:Object.prototype.toString.call(1)//[object Number]
+
+## 判断null和undefined
+
+[JavaScript深入理解之undefined与null](http://cavszhouyou.top/JavaScript%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E4%B9%8Bundefined%E4%B8%8Enull.html)
+
+### undefined
+
+#### 定义/意义
+
+对于定义了但未赋值的变量会返回一个undefined，对于未声明的变量，是一个undeclared，但使用typeof也能返回一个undefined
+
+#### 判断-两种方法
+
+1. 使用严格相等`===`或者`!==`可以判断。不能使用`==`因为存在`undefined==null`。
+2. 使用typeof可以判断
+
+#### void 0
+
+因为undefined在局部可以被赋任意值，所以使用`a === undefined`不一定安全。
+
+>The void operator evaluates the given expression and then returns undefined.（void 运算符 对给定的表达式进行求值，然后返回 undefined）
+
+也就是说使用void，后面不管跟什么表达式，都会返回一个undefined，这是一个原始undefined，所以使用void 0来代替直接使用undefined进行比较。`a === void 0`
+
+#### 全局属性window.undefined
+
+undefined不是一个值，它是一个属性名，undefined是全局对象的一个属性，也就是说，它是全局作用域的一个变量，即window.undefined，而window.undefined这个属性的值才是前面所说的原始值undefined。data = undefined;这就相当于把一个变量window.undefined的值赋值给另一个变量data，这个值就是原始值undefined。其实在JavaScript代码中,我们看到的undefined大多数情况指的都是window.undefined(本篇文章中多数情况下也是，原始值undefined除外)，原始值undefined多数情况下只存在于文档或规范中,不存在于JavaScript代码中(具体可以理解为代码中参与判断、比较或赋值的都是window.undefined，而在控制台中输出，或函数中返回的则是原始值undefined)。
+
+`console.log(window.undefined); //原始值undefined`
+
+###  undefined==null//true
+
+原因是发生了隐式转换。
+
+### null
+
+#### 定义
+
+null值表示一个空对象指针，指示变量未指向任何对象。
+
+#### 判断-2种方法
+
+1. 严格等于`===`，不用多说
+2. toString方法：注意这里需要加call方法，不然不管用。
+`console.log(Object.prototype.toString.call(null))//[object Null]`
+
+#### typeof null
+
+[为什么typeof null的结果是Object?](https://juejin.cn/post/6844903895177805837)
+
+return [object Object]
+
+这是为什么呢，原因是历史遗留。在早期为了优化性能，用地位来存储变量信息，而object对象标识为是`000`，null是全0，所以导致了这个问题。并且没有修改成为了一个feature。
+
+#### null的使用/意义
+
+##### 对于定义的变量，如果是打算让它成为一个保存对象的变量，但还没有保存，但可以先给它初始化为null。
+##### 对于使用完成的变量，可以通过为它赋null值来释放它的引用。（感觉很有用）--->什么是循环引用
+
+解除引用并不意味着回收它所占用的内存。它真正的作用是让值脱离执行环境，以便下次垃圾回收时回收它。同时接触引用还能防止出现循环引用的情况。
+
 
 
 # 变量类型
 
-[你真的掌握变量和类型了吗](https://juejin.cn/post/6844903854882947080)
+## [你真的掌握变量和类型了吗](https://juejin.cn/post/6844903854882947080)
 
 ## 原始类型与引用类型
 
@@ -706,7 +795,7 @@ for (let i = 0; i < 3; i++) {
 [typeof MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/typeof)
 [关于 typeof 的暂时性死区，了解一下](https://segmentfault.com/a/1190000020953219)
 
-typeof一个未声明的变量是没事的，会返回一个undefined，但若在死区中，就会报错了。
+typeof一个未声明的变量是没事的，会返回一个undefined，但若在死区中，就会报错了。其余时候对未声明的变量进行操作是会报错的，直接赋值后才能使用。如直接`console.log(a)//a未声明`会报错。
 
 “暂时性死区”也意味着 typeof 不再是一个百分之百安全的操作。
 ```js
