@@ -269,3 +269,113 @@ add(10, 25)
 ## bind、apply、call
 
 这个等改天了解了手写后再来看吧
+
+# 闭包
+
+闭包是能访问到自由变量的函数。闭包能记住创造自己的环境和作用域链。
+
+闭包访问不到其他作用域内的变量。两个同等级别的函数是访问不到互相的。
+比如
+
+```js
+{
+    let a=1;
+}
+
+function test(){
+    console.log(a);
+}
+```
+这是访问不到的。要说为什么，因为a是一个块级作用域内部的变量，对于test不是一个自由变量。自由变量首先是个变量，那么test函数外，只能看到一个封装起来的块级作用域，所以不识别他是一个变量，故访问不到。
+
+# [几种循环的区别](https://juejin.cn/post/6844903724897271816)
+
+# [手写call、apply](https://juejin.cn/post/6934726003533185038)
+
+## call
+
+```js
+var foo = {
+    value: 1
+};
+
+function bar() {
+    console.log(this.value);
+}
+
+bar.call(foo); // 1
+```
+
+相当于：
+
+```js
+var foo = {
+    value: 1,
+    bar: function() {
+        console.log(this.value)
+    }
+};
+
+foo.bar(); // 1
+```
+也就是说call函数可以看作是括号中的对象在调用.call前的函数。也即是说括号内的包含了前面的函数，即`foo.bar()`
+
+
+
+```js
+Function.prototype.newCall = function(ctx){
+    ctx = ctx||window;
+    ctx.func = this;
+    let args = [...arguments].slice(1);
+    let ret = ctx.func(...args);
+    delete ctx.func;
+    return ret;
+}
+Function.prototype.newApply = function(ctx,arr){
+    ctx = ctx||window;
+    let func = Symbol();
+    ctx[func] = this;
+    let ret;
+    if(!arr){
+        ret = ctx[func]();
+    }else{
+        ret = ctx[func](...arr);
+    }
+    delete ctx[func];
+    return ret;
+}
+
+Function.prototype.newBind = function(ctx){
+    let _this = this;
+    let args = Array.prototype.slice.call(arguments,1);
+    
+    let ret = function(){
+        let args2 = Array.prototype.slice.call(arguments);
+        _this.apply(this instanceof _this?this:ctx,args.concat(args2));
+    }
+    
+    let func = function(){};
+    func.prototype = this.prototype;
+    ret.prototype = new func();
+    return prototype;
+}
+
+var obj = {
+    value: 1
+}
+
+function bar(name, age) {
+    console.log(name)
+    console.log(age)
+    console.log(this.value);
+}
+
+console.log(bar.newCall(obj, 'kevin', 18));
+
+
+```
+
+# Promise实现
+[文章1](https://juejin.cn/post/6844903665686282253)
+[文章2](https://juejin.cn/post/6844904063570542599)
+
